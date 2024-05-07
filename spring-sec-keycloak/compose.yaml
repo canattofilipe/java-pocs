@@ -3,6 +3,8 @@ services:
     image: quay.io/keycloak/keycloak:24.0.3
     ports:
       - "8180:8080"
+    labels:
+      org.springframework.boot.ignore: true
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
