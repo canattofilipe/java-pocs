@@ -9,7 +9,7 @@ public class SampleController {
 
   @GetMapping("/private/content")
   public ResponseEntity<String> getPrivateContent() {
-    return ResponseEntity.ok("<h1> Private Content </h1>");
+    return ResponseEntity.ok("<h1> Public Content </h1>");
   }
 
   @GetMapping("/public/content")
