@@ -5,7 +5,9 @@
 
 To set up OAuth2 security with Spring Boot and Keycloak, follow these steps:
 
-1. **Create a New Realm**: 
+1. **Start Keycloak**:
+   - ```bash docker compose up -d```
+2. **Create a New Realm**: 
    - Navigate to the Keycloak admin console, click on "Realms", and then click "Add realm".
    - Name your realm and configure any necessary settings.
 
