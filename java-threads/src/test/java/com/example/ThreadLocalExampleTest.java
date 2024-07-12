@@ -111,8 +111,8 @@ public class ThreadLocalExampleTest {
         });
 
         Thread t2 = new Thread(() -> {
-            System.out.println("Thread 1: " + threadLocal1.get());
-            System.out.println("Thread 1: " + threadLocal2.get());
+            System.out.println("Thread 2: " + threadLocal1.get());
+            System.out.println("Thread 2: " + threadLocal2.get());
         });
 
         t1.start();
