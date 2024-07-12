@@ -90,6 +90,45 @@ public class ThreadLocalExampleTest {
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    void testThreadLocalWithInitialValue() {
+
+        ThreadLocal<MyObject> threadLocal1 = new ThreadLocal<>() {
+            @Override
+            protected MyObject initialValue() {
+                return new MyObject();
+            }
+        };
+
+        ThreadLocal<MyObject> threadLocal2 = ThreadLocal.withInitial(MyObject::new);
+
+
+        Thread t1 = new Thread(() -> {
+            System.out.println("Thread 1: " + threadLocal1.get());
+            System.out.println("Thread 1: " + threadLocal2.get());
+        });
+
+        Thread t2 = new Thread(() -> {
+            System.out.println("Thread 1: " + threadLocal1.get());
+            System.out.println("Thread 1: " + threadLocal2.get());
+        });
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    class MyObject {
 
     }
 }
