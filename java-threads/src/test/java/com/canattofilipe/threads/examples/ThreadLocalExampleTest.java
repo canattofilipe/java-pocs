@@ -1,4 +1,4 @@
-package com.example;
+package com.canattofilipe.threads.examples;
 
 import org.junit.jupiter.api.Test;
 
