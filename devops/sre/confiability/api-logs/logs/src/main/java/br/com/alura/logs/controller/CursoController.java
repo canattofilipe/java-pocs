@@ -8,6 +8,8 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/cursos")
+@Slf4j
 public class CursoController {
 
   final CursoService cursoService;
@@ -50,6 +53,7 @@ public class CursoController {
   public ResponseEntity<Page<CursoModel>> getAllCursos(
       @PageableDefault(page = 0, size = 10, sort = "dataInscricao", direction = Sort.Direction.ASC)
           Pageable pageable) {
+    log.info("Querying all courses");
     return ResponseEntity.status(HttpStatus.OK).body(cursoService.findAll(pageable));
   }
 
