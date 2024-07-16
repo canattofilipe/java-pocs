@@ -78,6 +78,117 @@ public class ThreadSignalingTest {
     }
   }
 
+  @Test
+  void missedSignalingExampleTest() {
+
+    SignalCarrier signalCarrier = new SignalCarrier();
+
+    Thread waiterThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread notifierThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doNotify();
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
+            });
+
+    // force notify to start before wait
+    notifierThread.start();
+    waiterThread.start();
+
+    try {
+      waiterThread.join();
+      notifierThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  void missedSignalingMitigatedExampleTest() {
+
+    SignalCarrier signalCarrier = new SignalHolder();
+
+    Thread waiterThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread notifierThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doNotify();
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
+            });
+
+    // force notify to start before wait
+    notifierThread.start();
+    waiterThread.start();
+
+    try {
+      waiterThread.join();
+      notifierThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  void missedSignalingMitigatedWithCounterExampleTest() {
+
+    SignalCarrier signalCarrier = new SignalCounter();
+
+    Thread waiterThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread notifierThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doNotify();
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
+            });
+
+    // force notify to start before wait
+    notifierThread.start();
+    waiterThread.start();
+
+    try {
+      waiterThread.join();
+      notifierThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   private class SignalCarrier {
 
     public void doWait() throws InterruptedException {
@@ -101,6 +212,76 @@ public class ThreadSignalingTest {
         System.out.println(Thread.currentThread().getName() + " calling notifyAll()");
         this.notifyAll();
         System.out.println(Thread.currentThread().getName() + " exited notifyAll()");
+      }
+    }
+  }
+
+  private class SignalHolder extends SignalCarrier {
+    private boolean signalRaised = false;
+    private boolean isThreadWaiting = false;
+
+    @Override
+    public void doNotify() throws InterruptedException {
+      synchronized (this) {
+        System.out.println(Thread.currentThread().getName() + " calling notify()");
+        if (!this.isThreadWaiting) {
+          signalRaised = true;
+        }
+        this.notify();
+        System.out.println(Thread.currentThread().getName() + " exited notify()");
+      }
+    }
+
+    @Override
+    public void doWait() throws InterruptedException {
+      synchronized (this) {
+        if (this.signalRaised) {
+          System.out.println(Thread.currentThread().getName() + " signal already raised");
+          return;
+        }
+        System.out.println(Thread.currentThread().getName() + " calling wait()");
+        this.isThreadWaiting = true;
+        this.wait();
+        this.isThreadWaiting = false;
+        System.out.println(Thread.currentThread().getName() + " exited wait()");
+      }
+    }
+  }
+
+  // The SignalHolder class does not know how many signals were raised.
+  private class SignalCounter extends SignalCarrier {
+
+    private int signals = 0;
+    private int threadsWaiting = 0;
+
+    @Override
+    public void doNotify() throws InterruptedException {
+      synchronized (this) {
+        System.out.println(Thread.currentThread().getName() + " calling notify()");
+        if (this.threadsWaiting == 0) {
+          signals++;
+        }
+        this.notify();
+        System.out.println(Thread.currentThread().getName() + " exited notify()");
+      }
+    }
+
+    @Override
+    public void doWait() throws InterruptedException {
+      synchronized (this) {
+        if (this.signals > 0) {
+          System.out.println(
+              Thread.currentThread().getName()
+                  + this.signals
+                  + " signals was already raised - decrementing signals and returning");
+          this.signals--;
+          return;
+        }
+        System.out.println(Thread.currentThread().getName() + " calling wait()");
+        this.threadsWaiting++;
+        this.wait();
+        this.threadsWaiting--;
+        System.out.println(Thread.currentThread().getName() + " exited wait()");
       }
     }
   }
