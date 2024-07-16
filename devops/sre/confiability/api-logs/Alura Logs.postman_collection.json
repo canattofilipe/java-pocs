@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "54d9aa5f-fe85-4b3c-8e73-aa7ac709ac63",
+		"name": "Alura Logs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/cursos",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numeroMatricula\":\"2304198301\",\n    \"numeroCurso\":\"1403198901\",\n    \"nomeCurso\":\"Instrumentação e Refatoração de Logs\",\n    \"categoriaCurso\":\"Site Reliability Enginner\",\n    \"preRequisito\":\"Formação DevOps\",\n    \"nomeProfessor\":\"Kleber Costa\",\n    \"periodoCurso\":\"10 horas\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/cursos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/cursos",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/cursos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/cursos/d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numeroMatricula\": \"2304198301\",\n    \"numeroCurso\": \"1403198901\",\n    \"nomeCurso\": \"Instrumentação e Refatoração de Logs\",\n    \"categoriaCurso\": \"Site Reliability Enginner\",\n    \"preRequisito\": \"Formação DevOps\",\n    \"nomeProfessor\": \"Kleber de Paiva Siqueira Costa\",\n    \"periodoCurso\": \"10 horas\",\n    \"dataInscricao\": \"2022-05-15T17:48:33.515151\"\n}\n   "
+				},
+				"url": {
+					"raw": "http://localhost:8080/cursos/d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos",
+						"d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/cursos/d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/cursos/d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos",
+						"d377bf69-5cbd-4bb5-9fdb-6c9c7162a30c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/cursos/5ab35fd5-60b9-4801-a83a-8b9298a86a69",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/cursos/5ab35fd5-60b9-4801-a83a-8b9298a86a69",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos",
+						"5ab35fd5-60b9-4801-a83a-8b9298a86a69"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/cursos?page=0&size=3&sort=dataInscricao,DESC",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/cursos?page=0&size=3&sort=dataInscricao,DESC",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"cursos"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "3"
+						},
+						{
+							"key": "sort",
+							"value": "dataInscricao,DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

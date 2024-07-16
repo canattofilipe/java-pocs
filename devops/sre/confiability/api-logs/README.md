@@ -1,0 +1,2 @@
+# Overview
+This project is based on the course "Confiabilidade: garantindo o estado de integridade de sistemas através de logs" offered by Alura. The main focus of the project is to ensure the reliability and integrity of systems by utilizing logging mechanisms.
