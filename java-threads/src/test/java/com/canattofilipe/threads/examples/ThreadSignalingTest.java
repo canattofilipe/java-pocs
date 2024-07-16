@@ -189,6 +189,57 @@ public class ThreadSignalingTest {
     }
   }
 
+  @Test
+  void notifyManyExampleTest() throws InterruptedException {
+
+    SignalCarrier signalCarrier = new SignalCarrier();
+
+    Thread waiterThread1 =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread waiterThread2 =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread notifierThread =
+        new Thread(
+            () -> {
+              try {
+                signalCarrier.doNotifyAll();
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
+            });
+
+    waiterThread1.start();
+    waiterThread2.start();
+    // force wait to start before notify
+    Thread.sleep(9000);
+    notifierThread.start();
+
+    try {
+      waiterThread1.join();
+      waiterThread2.join();
+      notifierThread.join();
+
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
   private class SignalCarrier {
 
     public void doWait() throws InterruptedException {
