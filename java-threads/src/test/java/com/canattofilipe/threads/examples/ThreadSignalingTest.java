@@ -240,7 +240,38 @@ public class ThreadSignalingTest {
     }
   }
 
-  private class SignalCarrier {
+  @Test
+  void spuriousSignalingExample() throws InterruptedException {
+
+    System.out.println("Parent thread name: " + Thread.currentThread().getName());
+
+    SpuriousWakeUpHandler signalingObject = new SpuriousWakeUpHandler();
+
+    Thread waiterThread =
+        new Thread(
+            () -> {
+              try {
+                signalingObject.doWait();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            });
+
+    Thread notifierThread = new Thread(() -> signalingObject.doNotify());
+
+    waiterThread.start();
+    Thread.sleep(1000);
+    notifierThread.start();
+
+    try {
+      waiterThread.join();
+      notifierThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static class SignalCarrier {
 
     public void doWait() throws InterruptedException {
       synchronized (this) {
@@ -267,12 +298,12 @@ public class ThreadSignalingTest {
     }
   }
 
-  private class SignalHolder extends SignalCarrier {
+  private static class SignalHolder extends SignalCarrier {
     private boolean signalRaised = false;
     private boolean isThreadWaiting = false;
 
     @Override
-    public void doNotify() throws InterruptedException {
+    public void doNotify() {
       synchronized (this) {
         System.out.println(Thread.currentThread().getName() + " calling notify()");
         if (!this.isThreadWaiting) {
@@ -300,13 +331,13 @@ public class ThreadSignalingTest {
   }
 
   // The SignalHolder class does not know how many signals were raised.
-  private class SignalCounter extends SignalCarrier {
+  private static class SignalCounter extends SignalCarrier {
 
     private int signals = 0;
     private int threadsWaiting = 0;
 
     @Override
-    public void doNotify() throws InterruptedException {
+    public void doNotify() {
       synchronized (this) {
         System.out.println(Thread.currentThread().getName() + " calling notify()");
         if (this.threadsWaiting == 0) {
@@ -333,6 +364,32 @@ public class ThreadSignalingTest {
         this.wait();
         this.threadsWaiting--;
         System.out.println(Thread.currentThread().getName() + " exited wait()");
+      }
+    }
+  }
+
+  private static class SpuriousWakeUpHandler {
+
+    private final Object monitorObject = new Object();
+    private boolean signalRaised = false;
+
+    public void doNotify() {
+      synchronized (monitorObject) {
+        System.out.println(Thread.currentThread().getName() + " Notifying ...");
+        signalRaised = true;
+        monitorObject.notify();
+        System.out.println(Thread.currentThread().getName() + " Notified ...");
+      }
+    }
+
+    public void doWait() throws InterruptedException {
+      synchronized (monitorObject) {
+        while (!signalRaised) {
+          System.out.println(Thread.currentThread().getName() + " Signal not raised - waiting ...");
+          monitorObject.wait();
+          System.out.println(Thread.currentThread().getName() + " Signal raised - exiting wait");
+        }
+        signalRaised = false;
       }
     }
   }
