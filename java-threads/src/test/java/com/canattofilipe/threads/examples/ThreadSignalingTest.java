@@ -1,5 +1,9 @@
 package com.canattofilipe.threads.examples;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 public class ThreadSignalingTest {
@@ -8,6 +12,8 @@ public class ThreadSignalingTest {
   void basicSignalingExample() {
 
     Object signalingObject = new Object();
+    final boolean[] isWaiterThreadWokenUp = {false};
+    final boolean[] isNotifierThreadCompleted = {false};
 
     Thread waiterThread =
         new Thread(
@@ -15,6 +21,7 @@ public class ThreadSignalingTest {
               synchronized (signalingObject) {
                 try {
                   signalingObject.wait();
+                  isWaiterThreadWokenUp[0] = true;
                   System.out.println("waiterThread woke up!");
                 } catch (InterruptedException e) {
                   e.printStackTrace();
@@ -27,6 +34,7 @@ public class ThreadSignalingTest {
             () -> {
               synchronized (signalingObject) {
                 signalingObject.notify();
+                isNotifierThreadCompleted[0] = true;
                 System.out.println("waiterThread notified!");
               }
             });
@@ -40,18 +48,24 @@ public class ThreadSignalingTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertTrue(isWaiterThreadWokenUp[0], "waiterThread should have woken up");
+    assertTrue(isNotifierThreadCompleted[0], "notifierThread should have completed");
   }
 
   @Test
   void threadSignalingExampleTest() {
 
     SignalCarrier signalCarrier = new SignalCarrier();
+    final boolean[] isWaiterThreadWokenUp = {false};
+    final boolean[] isNotifierThreadCompleted = {false};
 
     Thread waiterThread =
         new Thread(
             () -> {
               try {
                 signalCarrier.doWait();
+                isWaiterThreadWokenUp[0] = true;
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
@@ -62,6 +76,7 @@ public class ThreadSignalingTest {
             () -> {
               try {
                 signalCarrier.doNotify();
+                isNotifierThreadCompleted[0] = true;
               } catch (InterruptedException e) {
                 throw new RuntimeException(e);
               }
@@ -76,10 +91,17 @@ public class ThreadSignalingTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertTrue(isWaiterThreadWokenUp[0], "waiterThread should have woken up");
+    assertTrue(isNotifierThreadCompleted[0], "notifierThread should have completed");
   }
 
+  // The test will get stuck because wait was called before notify, causing the signal to be lost.
   @Test
   void missedSignalingExampleTest() {
+
+    String shouldRun = System.getenv("RUN_STUCKABLE_TESTS");
+    Assumptions.assumeTrue("true".equalsIgnoreCase(shouldRun));
 
     SignalCarrier signalCarrier = new SignalCarrier();
 
@@ -119,12 +141,15 @@ public class ThreadSignalingTest {
   void missedSignalingMitigatedExampleTest() {
 
     SignalCarrier signalCarrier = new SignalHolder();
+    final boolean[] isWaiterThreadWokenUp = {false};
+    final boolean[] isNotifierThreadCompleted = {false};
 
     Thread waiterThread =
         new Thread(
             () -> {
               try {
                 signalCarrier.doWait();
+                isWaiterThreadWokenUp[0] = true;
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
@@ -135,6 +160,7 @@ public class ThreadSignalingTest {
             () -> {
               try {
                 signalCarrier.doNotify();
+                isNotifierThreadCompleted[0] = true;
               } catch (InterruptedException e) {
                 throw new RuntimeException(e);
               }
@@ -150,18 +176,24 @@ public class ThreadSignalingTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertTrue(isWaiterThreadWokenUp[0], "waiterThread should have woken up");
+    assertTrue(isNotifierThreadCompleted[0], "notifierThread should have completed");
   }
 
   @Test
   void missedSignalingMitigatedWithCounterExampleTest() {
 
     SignalCarrier signalCarrier = new SignalCounter();
+    final boolean[] isWaiterThreadWokenUp = {false};
+    final boolean[] isNotifierThreadCompleted = {false};
 
     Thread waiterThread =
         new Thread(
             () -> {
               try {
                 signalCarrier.doWait();
+                isWaiterThreadWokenUp[0] = true;
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
@@ -172,6 +204,7 @@ public class ThreadSignalingTest {
             () -> {
               try {
                 signalCarrier.doNotify();
+                isNotifierThreadCompleted[0] = true;
               } catch (InterruptedException e) {
                 throw new RuntimeException(e);
               }
@@ -187,18 +220,25 @@ public class ThreadSignalingTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertTrue(isWaiterThreadWokenUp[0], "waiterThread should have woken up");
+    assertTrue(isNotifierThreadCompleted[0], "notifierThread should have completed");
   }
 
   @Test
   void notifyManyExampleTest() throws InterruptedException {
 
     SignalCarrier signalCarrier = new SignalCarrier();
+    final AtomicBoolean isWaiterThread1WokenUp = new AtomicBoolean(false);
+    AtomicBoolean isWaiterThread2WokenUp = new AtomicBoolean(false);
+    AtomicBoolean isNotifierThreadCompleted = new AtomicBoolean(false);
 
     Thread waiterThread1 =
         new Thread(
             () -> {
               try {
                 signalCarrier.doWait();
+                isWaiterThread1WokenUp.set(true);
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
@@ -209,6 +249,7 @@ public class ThreadSignalingTest {
             () -> {
               try {
                 signalCarrier.doWait();
+                isWaiterThread2WokenUp.set(true);
               } catch (InterruptedException e) {
                 e.printStackTrace();
               }
@@ -219,6 +260,7 @@ public class ThreadSignalingTest {
             () -> {
               try {
                 signalCarrier.doNotifyAll();
+                isNotifierThreadCompleted.set(true);
               } catch (InterruptedException e) {
                 throw new RuntimeException(e);
               }
@@ -238,6 +280,10 @@ public class ThreadSignalingTest {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+
+    assertTrue(isWaiterThread1WokenUp.get(), "waiter1Thread should have woken up");
+    assertTrue(isWaiterThread1WokenUp.get(), "waiter2Thread should have woken up");
+    assertTrue(isNotifierThreadCompleted.get(), "notifierThread should have completed");
   }
 
   private class SignalCarrier {
