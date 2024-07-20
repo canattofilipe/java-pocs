@@ -2,9 +2,15 @@
 
     <property name="LOG_PATH" value="logs/api-cursos.log"/>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${LOG_PATH}</file>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/api-cursos.log</file>
         <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/api-cursos.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <totalSizeCap>200MB</totalSizeCap>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
@@ -16,8 +22,11 @@
         </encoder>
     </appender>
 
-    <root level="info">
+    <logger name="br.com.alura.logs.controller.CursoController" level="info" additivity="false">
         <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="debug">
         <appender-ref ref="STDOUT"/>
     </root>
 
