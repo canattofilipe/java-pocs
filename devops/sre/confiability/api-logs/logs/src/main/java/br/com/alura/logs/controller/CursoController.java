@@ -93,10 +93,17 @@ public class CursoController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> deleteCursos(@PathVariable(value = "id") UUID id) {
+
+    log.info("Deleting course by id");
+
+    log.info("Checking if the course exists");
     Optional<CursoModel> cursoModelOptional = cursoService.findById(id);
     if (!cursoModelOptional.isPresent()) {
+      log.warn("Query by id returned no results");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Curso não encontrado!");
     }
+
+    log.info("Course found, deleting");
     cursoService.delete(cursoModelOptional.get());
     return ResponseEntity.status(HttpStatus.OK).body("Curso excluído com sucesso!");
   }
@@ -104,14 +111,23 @@ public class CursoController {
   @PutMapping("/{id}")
   public ResponseEntity<Object> updateCursos(
       @PathVariable(value = "id") UUID id, @RequestBody @Valid CursoDto cursoDto) {
+
+    log.info("Updating course by id");
+
+    log.info("Checking if the course exists");
     Optional<CursoModel> cursoModelOptional = cursoService.findById(id);
     if (!cursoModelOptional.isPresent()) {
+      log.warn("Query by id returned no results");
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Curso não encontrado!");
     }
+
+    log.info("Course found, updating");
     var cursoModel = new CursoModel();
     BeanUtils.copyProperties(cursoDto, cursoModel);
     cursoModel.setId(cursoModelOptional.get().getId());
     cursoModel.setDataInscricao(cursoModelOptional.get().getDataInscricao());
+
+    log.info("Course updated successfully");
     return ResponseEntity.status(HttpStatus.OK).body(cursoService.save(cursoModel));
   }
 }
