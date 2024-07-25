@@ -44,7 +44,7 @@ public class LogsHandlers {
     return new LogsErrorDto(businessException);
   }
 
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_GATEWAY)
   @ExceptionHandler(InternalErrorException.class)
   public LogsErrorDto internalErrorExceptionHandler(InternalErrorException internalErrorException) {
     return new LogsErrorDto(internalErrorException);
