@@ -57,7 +57,6 @@ public class Runnable1TimeOut implements Runnable {
     try {
       boolean lock1Acquired = lock1.tryLock(1000, TimeUnit.MILLISECONDS);
       if (!lock1Acquired) {
-        System.out.println(threadName + " - Could not acquire lock1");
         return false;
       }
     } catch (InterruptedException e) {
@@ -68,11 +67,12 @@ public class Runnable1TimeOut implements Runnable {
     try {
       boolean lock2Acquired = lock2.tryLock(1000, TimeUnit.MILLISECONDS);
       if (!lock2Acquired) {
-        System.out.println(threadName + " - Could not acquire lock2");
+        lock1.unlock();
         return false;
       }
     } catch (InterruptedException e) {
       System.out.println(threadName + " interrupted trying to lock Lock 2");
+      lock1.unlock();
       return false;
     }
 
