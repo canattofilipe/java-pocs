@@ -18,7 +18,9 @@ public class Runnable1TimeOut implements Runnable {
 
     final String threadName = Thread.currentThread().getName();
 
-    while (true) {
+    int retries = 0;
+    while (retries <= 100) {
+      retries++;
       int failureCount = 0;
       while (!tryLockBothLocks()) {
         failureCount++;
