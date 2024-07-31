@@ -3,12 +3,12 @@ package com.canattofilipe.threads.examples.support.deadlock;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
-public class Runnable2Timeout implements Runnable {
+public class Runnable1TimeOut implements Runnable {
 
   private final Lock lock1;
   private final Lock lock2;
 
-  public Runnable2Timeout(Lock lock1, Lock lock2) {
+  public Runnable1TimeOut(Lock lock1, Lock lock2) {
     this.lock1 = lock1;
     this.lock2 = lock2;
   }
@@ -55,24 +55,24 @@ public class Runnable2Timeout implements Runnable {
     final String threadName = Thread.currentThread().getName();
 
     try {
-      boolean lock1Acquired = lock2.tryLock(1000, TimeUnit.MILLISECONDS);
+      boolean lock1Acquired = lock1.tryLock(1000, TimeUnit.MILLISECONDS);
       if (!lock1Acquired) {
-        System.out.println(threadName + " - Could not acquire lock2");
-        return false;
-      }
-    } catch (InterruptedException e) {
-      System.out.println(threadName + " interrupted trying to lock Lock 2");
-      return false;
-    }
-
-    try {
-      boolean lock2Acquired = lock1.tryLock(1000, TimeUnit.MILLISECONDS);
-      if (!lock2Acquired) {
         System.out.println(threadName + " - Could not acquire lock1");
         return false;
       }
     } catch (InterruptedException e) {
       System.out.println(threadName + " interrupted trying to lock Lock 1");
+      return false;
+    }
+
+    try {
+      boolean lock2Acquired = lock2.tryLock(1000, TimeUnit.MILLISECONDS);
+      if (!lock2Acquired) {
+        System.out.println(threadName + " - Could not acquire lock2");
+        return false;
+      }
+    } catch (InterruptedException e) {
+      System.out.println(threadName + " interrupted trying to lock Lock 2");
       return false;
     }
 
