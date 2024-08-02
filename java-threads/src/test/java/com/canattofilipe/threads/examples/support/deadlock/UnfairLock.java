@@ -1,8 +1,9 @@
 package com.canattofilipe.threads.examples.support.deadlock;
 
+import com.canattofilipe.threads.examples.CustomLock;
 import java.time.Instant;
 
-public class UnfairnessLock {
+public class UnfairLock implements CustomLock {
 
   private boolean isLocked = false;
   private Thread lockingThread = null;
