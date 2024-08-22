@@ -1,18 +1,16 @@
 package com.canattofilipe.threads.examples;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExecutorServiceExample1Test {
 
@@ -60,13 +58,43 @@ public class ExecutorServiceExample1Test {
 
     executorService.shutdown();
 
+    futures.forEach(future -> assertTrue(future.isDone()));
     assertTrue(executorService.isShutdown());
+  }
+
+  @Test
+  void simpleExecServiceWithCallable() {
+
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    Future future = executorService.submit(newCallable("Task 1"));
+
+    try {
+      final var result = future.get();
+      System.out.println(result);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+
+    executorService.shutdown();
+
+    assertTrue(executorService.isShutdown());
+    assertTrue(future.isDone());
   }
 
   private static Runnable newRunnable(String msg) {
     return () -> {
       String completeMsg = Thread.currentThread().getName() + " - " + msg;
       System.out.println(completeMsg);
+    };
+  }
+
+  private static Callable newCallable(String msg) {
+    return () -> {
+      String completeMsg = Thread.currentThread().getName() + " - " + msg;
+      return completeMsg;
     };
   }
 }
