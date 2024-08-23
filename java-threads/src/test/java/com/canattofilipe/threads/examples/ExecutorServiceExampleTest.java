@@ -133,6 +133,39 @@ public class ExecutorServiceExampleTest {
     }
   }
 
+  @Test
+  void unfairnessExecutorServiceTest() {
+
+    // by unfairness, we mean that the executor will accept both fast and slow tasks
+    ExecutorService unfairnessExecutorService = Executors.newFixedThreadPool(1);
+
+    Runnable fastTask = () -> System.out.println("Executing fast task");
+    Runnable slowTask =
+        () -> {
+          try {
+            System.out.println("Executing slow task");
+            Thread.sleep(5000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        };
+
+    long start = System.currentTimeMillis();
+    unfairnessExecutorService.execute(fastTask);
+    unfairnessExecutorService.execute(slowTask);
+    unfairnessExecutorService.execute(fastTask);
+    unfairnessExecutorService.execute(fastTask);
+
+    try {
+      unfairnessExecutorService.shutdown();
+      unfairnessExecutorService.awaitTermination(100, java.util.concurrent.TimeUnit.SECONDS);
+      long end = System.currentTimeMillis();
+      System.out.println(end - start);
+    } catch (InterruptedException e) {
+      fail("Should not reach here");
+    }
+  }
+
   private static Runnable newRunnable(String msg) {
     return () -> {
       String completeMsg = Thread.currentThread().getName() + " - " + msg;
