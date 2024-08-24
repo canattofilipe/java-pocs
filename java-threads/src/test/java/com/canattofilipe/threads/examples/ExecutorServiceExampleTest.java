@@ -166,6 +166,21 @@ public class ExecutorServiceExampleTest {
     }
   }
 
+  @Test
+  void executorServiceWithVirtualThread() {
+
+    ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+
+    Future<String> future = executorService.submit(newCallable("Task 1"));
+
+    try {
+      final var result = future.get();
+      assertNotNull(result);
+    } catch (InterruptedException | ExecutionException e) {
+      fail("Should not reach here");
+    }
+  }
+
   private static Runnable newRunnable(String msg) {
     return () -> {
       String completeMsg = Thread.currentThread().getName() + " - " + msg;
@@ -173,7 +188,7 @@ public class ExecutorServiceExampleTest {
     };
   }
 
-  private static Callable newCallable(String msg) {
+  private static Callable<String> newCallable(String msg) {
     return () -> {
       String completeMsg = Thread.currentThread().getName() + " - " + msg;
       return completeMsg;
